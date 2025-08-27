@@ -1,6 +1,6 @@
 {
   "name": "etf-portal-backend",
-  "type": "module",
+  "type": "commonjs",
   "version": "1.0.0",
   "scripts": { "start": "node src/server.js" },
   "dependencies": {
@@ -16,3 +16,4 @@
     "xlsx": "^0.18.5"
   }
 }
+
