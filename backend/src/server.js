@@ -12,18 +12,18 @@
 
  app.use(helmet());
  app.use(express.json());
-- app.use('/auth', require('./routes/auth'));
-- app.use(cors({ origin: process.env.CORS_ORIGIN }));
-+ // apply CORS globally so preflights hit it before auth/upload
-+ app.use(cors({ origin: process.env.CORS_ORIGIN }));
-+ // also explicitly respond to all OPTIONS preflights
-+ app.options('*', cors({ origin: process.env.CORS_ORIGIN }));
+
+// apply CORS globally so preflights hit it before auth/upload
+app.use(cors({ origin: process.env.CORS_ORIGIN }));
+// also explicitly respond to all OPTIONS preflights
+app.options('*', cors({ origin: process.env.CORS_ORIGIN }));
 
  app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
 
-- app.use('/upload', requireAuth, uploadRouter);
-+ // now /auth route using the already-imported router
-+ app.use('/auth', authRouter);
-+ app.use('/upload', requireAuth, uploadRouter);
+
+// now /auth route using the already-imported router
+app.use('/auth', authRouter);
+app.use('/upload', requireAuth, uploadRouter);
 
  app.use('/etfs', etfsRouter);
+
