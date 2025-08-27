@@ -8,27 +8,34 @@ import authRouter, { requireAuth } from './auth.js';
 import uploadRouter from './upload.js';
 import etfsRouter from './etfs.js';
 
-// Initialize database before accepting requests
+// Initialize DB before accepting requests
 await initDb();
 
 const app = express();
 
-// CORS must run first so every route (incl. preflights) gets headers
+// --- CORS configuration ---
+// Apply CORS globally so every route, incl. /auth/login, gets the header
 app.use(cors({ origin: process.env.CORS_ORIGIN }));
+// Explicitly respond to all preflight requests
 app.options('*', cors({ origin: process.env.CORS_ORIGIN }));
 
 app.use(helmet());
 app.use(express.json());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
 
-// Public routes
+// --- Routes ---
+// Public login/auth routes
 app.use('/auth', authRouter);
+
+// Public data
 app.use('/etfs', etfsRouter);
 
-// Protected routes
+// Explicit OPTIONS handler for /upload so CORS runs before requireAuth
+app.options('/upload', cors({ origin: process.env.CORS_ORIGIN }));
+// Protected upload route
 app.use('/upload', requireAuth, uploadRouter);
 
-// Simple health check
+// Health check
 app.get('/health', (req, res) => res.json({ ok: true }));
 
 const port = process.env.PORT || 3000;
