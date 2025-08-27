@@ -1,28 +1,29 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
+ import express from 'express';
+ import cors from 'cors';
+ import helmet from 'helmet';
+ import rateLimit from 'express-rate-limit';
+ import { initDb } from './db.js';
+ import authRouter, { requireAuth } from './auth.js';
+ import uploadRouter from './upload.js';
+ import etfsRouter from './etfs.js';
 
-import { initDb } from './db.js';
-import authRouter, { requireAuth } from './auth.js';
-import uploadRouter from './upload.js';
-import etfsRouter from './etfs.js';
+ await initDb();
+ const app = express();
 
-await initDb();
+ app.use(helmet());
+ app.use(express.json());
+- app.use('/auth', require('./routes/auth'));
+- app.use(cors({ origin: process.env.CORS_ORIGIN }));
++ // apply CORS globally so preflights hit it before auth/upload
++ app.use(cors({ origin: process.env.CORS_ORIGIN }));
++ // also explicitly respond to all OPTIONS preflights
++ app.options('*', cors({ origin: process.env.CORS_ORIGIN }));
 
-const app = express();
+ app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
 
-app.use(helmet());
-app.use(express.json());
-app.use(cors({ origin: process.env.CORS_ORIGIN }));
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
+- app.use('/upload', requireAuth, uploadRouter);
++ // now /auth route using the already-imported router
++ app.use('/auth', authRouter);
++ app.use('/upload', requireAuth, uploadRouter);
 
-app.use('/auth', authRouter);
-app.use('/upload', requireAuth, uploadRouter);
-app.use('/etfs', etfsRouter);
-
-app.get('/health', (req, res) => res.json({ ok: true }));
-
-app.listen(process.env.PORT || 3000, () =>
-  console.log(`API live on port ${process.env.PORT || 3000}`)
-);
+ app.use('/etfs', etfsRouter);
