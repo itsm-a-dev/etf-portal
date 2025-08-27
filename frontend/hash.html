@@ -1,21 +1,22 @@
 <!doctype html>
 <html>
-<head><meta charset="utf-8"><title>Bcrypt Hash</title></head>
+<head><meta charset="utf-8"><title>Bcrypt Hash Generator</title></head>
 <body>
   <h3>Create bcrypt hash</h3>
-  <input id="pwd" type="password" placeholder="password" />
+  <input id="pwd" type="password" placeholder="Enter password" />
   <button id="go">Generate</button>
-  <pre id="out"></pre>
+  <pre id="out" style="white-space: pre-wrap; word-break: break-all;"></pre>
+
+  <!-- Load bcryptjs for browser use -->
   <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
   <script>
-    document.getElementById('go').onclick = async () => {
+    document.getElementById('go').onclick = () => {
       const pwd = document.getElementById('pwd').value;
       if (!pwd) return alert('Enter a password');
-      const salt = bcrypt.genSaltSync(10);
-      const hash = bcrypt.hashSync(pwd, salt);
+      const salt = dcodeIO.bcrypt.genSaltSync(10);
+      const hash = dcodeIO.bcrypt.hashSync(pwd, salt);
       document.getElementById('out').textContent = hash;
     };
   </script>
 </body>
 </html>
-
