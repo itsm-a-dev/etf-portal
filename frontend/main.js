@@ -1,4 +1,4 @@
-const API_BASE = 'YOUR_RAILWAY_API_URL';
+const API_BASE = 'etf-portal-production.up.railway.app';
 
 async function loadTable() {
   const res = await fetch(`${API_BASE}/etfs`);
@@ -10,3 +10,4 @@ async function loadTable() {
     th.textContent = c;
     thead.appendChild(th);
   });
+
