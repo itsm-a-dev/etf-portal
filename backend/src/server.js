@@ -8,20 +8,20 @@ import authRouter, { requireAuth } from './auth.js';
 import uploadRouter from './upload.js';
 import etfsRouter from './etfs.js';
 
-// Initialize DB before accepting requests
 await initDb();
 
 const app = express();
+app.set('trust proxy', 1); // <-- add this line
 
-// --- CORS configuration ---
-// Apply CORS globally so every route, incl. /auth/login, gets the header
 app.use(cors({ origin: process.env.CORS_ORIGIN }));
-// Explicitly respond to all preflight requests
 app.options('*', cors({ origin: process.env.CORS_ORIGIN }));
 
 app.use(helmet());
 app.use(express.json());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
+
+// routes...
+
 
 // --- Routes ---
 // Public login/auth routes
@@ -42,3 +42,4 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`API live on port ${port}`);
 });
+
